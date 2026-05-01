@@ -171,3 +171,23 @@ NUM_WORKERS = 0
 
 <img width="500"  alt="image" src="https://github.com/user-attachments/assets/d21c6042-fe63-4a14-9231-794674c7a5ce" />
 
+## Transfer Learning
+
+```text
+SEED = 42
+DATA_DIR = Path("data")
+OUTPUT_DIR = Path("models")
+IMAGE_SIZE = 224
+BATCH_SIZE = 16
+EPOCHS = 10
+LEARNING_RATE = 1e-4
+NUM_WORKERS = 0
+USE_PRETRAINED = True
+FREEZE_BACKBONE = True
+```
+
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/966a1952-bafb-4c4a-9fb4-0a9e1c8e2eae" />
+
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/bb0c790c-11bc-473e-8ca3-b5dbccf998d2" />
+
+
