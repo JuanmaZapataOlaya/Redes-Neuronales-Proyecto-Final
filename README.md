@@ -95,6 +95,8 @@ Ejecuta las celdas de arriba hacia abajo. Antes de entrenar puedes ajustar estos
 - `EPOCHS`: numero de epocas.
 - `LEARNING_RATE`: tasa de aprendizaje.
 
+Si ejecutas en Kaggle, corre la celda opcional marcada como `CELDA OPCIONAL PARA KAGGLE` despues de imports/configuracion. Esa celda busca el dataset dentro de `/kaggle/input` y ajusta `DATA_DIR` automaticamente.
+
 ## Arquitectura base
 
 `BaseCNN` usa tres bloques convolucionales:
