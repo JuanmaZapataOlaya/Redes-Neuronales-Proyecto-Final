@@ -1,6 +1,6 @@
-# Diagnostico de Neumonia con CNN Base
+# Diagnostico de Neumonia con Redes Neuronales
 
-Proyecto academico en Python y PyTorch para clasificar radiografias de torax como `NORMAL` o `PNEUMONIA`. La estructura se simplifico a un README y un notebook autocontenido con la primera arquitectura base implementada de principio a fin.
+Proyecto academico en Python y PyTorch para clasificar radiografias de torax como `NORMAL` o `PNEUMONIA`. La estructura se mantiene simple: un README y notebooks autocontenidos para comparar tres arquitecturas.
 
 > Este proyecto es educativo. No debe utilizarse como herramienta clinica sin validacion medica, auditoria de sesgos y evaluacion regulatoria.
 
@@ -10,15 +10,17 @@ Proyecto academico en Python y PyTorch para clasificar radiografias de torax com
 .
 |-- README.md
 |-- arquitectura_base_neumonia.ipynb
+|-- arquitectura_cnn_avanzada_neumonia.ipynb
+|-- arquitectura_transfer_learning_neumonia.ipynb
 `-- .gitignore
 ```
 
-El notebook contiene todo el flujo:
+Cada notebook contiene todo el flujo:
 
 - Configuracion reproducible.
 - Carga del dataset desde carpetas.
 - Transformaciones de entrenamiento y validacion.
-- Arquitectura `BaseCNN`.
+- Arquitectura del modelo correspondiente.
 - Ciclo de entrenamiento y evaluacion.
 - Guardado del mejor modelo.
 - Graficas de perdida y exactitud.
@@ -51,14 +53,37 @@ Instala las librerias necesarias en tu entorno:
 pip install torch torchvision matplotlib scikit-learn pillow notebook
 ```
 
-Si tienes GPU NVIDIA, instala la version de PyTorch compatible con tu CUDA desde la guia oficial de PyTorch. El notebook detecta CUDA automaticamente cuando esta disponible.
+Si tienes GPU NVIDIA, instala la version de PyTorch compatible con tu CUDA desde la guia oficial de PyTorch. Los notebooks detectan CUDA automaticamente cuando esta disponible.
 
 ## Uso
 
-Abre el notebook:
+Descarga el dataset en Kaggle:
+
+https://www.kaggle.com/datasets/assemelqirsh/chest-x-ray-dataset?resource=download
+
+Para este caso solo vamos a usar `chest_xray`, respetando la estructura con la que ya viene:
+
+```text
+data/
+  train/
+    NORMAL/
+    PNEUMONIA/
+  val/
+    NORMAL/
+    PNEUMONIA/
+  test/
+    NORMAL/
+    PNEUMONIA/
+```
+
+Cambia el nombre de la carpeta a `data`; si no, fallara la celda de carga de datos.
+
+Abre el notebook que quieras entrenar:
 
 ```bash
 jupyter notebook arquitectura_base_neumonia.ipynb
+jupyter notebook arquitectura_cnn_avanzada_neumonia.ipynb
+jupyter notebook arquitectura_transfer_learning_neumonia.ipynb
 ```
 
 Ejecuta las celdas de arriba hacia abajo. Antes de entrenar puedes ajustar estos parametros en la celda de configuracion:
@@ -81,7 +106,13 @@ Conv2d -> ReLU -> MaxPool2d
 AdaptiveAvgPool2d -> Linear -> ReLU -> Linear
 ```
 
-La salida tiene dos clases: `NORMAL` y `PNEUMONIA`.
+## CNN avanzada
+
+`AdvancedCNN` usa bloques con dos convoluciones, `BatchNorm2d`, `ReLU`, `MaxPool2d` y `Dropout`. Es una segunda prueba mas robusta para reducir sobreajuste y comparar contra la arquitectura base.
+
+## Transfer learning
+
+El notebook de transferencia usa `ResNet-50` de `torchvision`, reemplaza la capa final por una salida de dos clases y permite congelar el backbone con `FREEZE_BACKBONE = True`.
 
 ## Salidas
 
@@ -90,11 +121,15 @@ Durante el entrenamiento se crea la carpeta `models/` con:
 ```text
 models/
   best_base_cnn.pth
+  best_advanced_cnn.pth
+  best_resnet50_transfer.pth
   training_curves.png
+  training_curves_advanced_cnn.png
+  training_curves_resnet50_transfer.png
 ```
 
-El checkpoint guarda los pesos del mejor modelo segun exactitud de validacion, el tamano de imagen y el mapeo de clases.
+Cada checkpoint guarda los pesos del mejor modelo segun exactitud de validacion, el tamano de imagen y el mapeo de clases.
 
 ## Siguiente paso sugerido
 
-Una vez validada la CNN base, el siguiente paso natural es comparar contra una arquitectura con `BatchNorm2d` y `Dropout`, o contra transferencia de aprendizaje con una red pre-entrenada.
+Entrena los tres notebooks con los mismos splits y compara exactitud, precision, recall y F1-score sobre `test`.
