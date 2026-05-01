@@ -135,3 +135,11 @@ Cada checkpoint guarda los pesos del mejor modelo segun exactitud de validacion,
 ## Siguiente paso sugerido
 
 Entrena los tres notebooks con los mismos splits y compara exactitud, precision, recall y F1-score sobre `test`.
+
+# Resultados Obtenidos
+
+## Arquitectura Base
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/3adfada4-566f-4a04-a626-dc520a144eaa" />
+
+<img width="500"  alt="image" src="https://github.com/user-attachments/assets/a69fc5c6-f2ff-4a74-9403-ea4ecde3ce73" />
+
