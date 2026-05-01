@@ -1,0 +1,29 @@
+# Datos locales
+data/
+
+# Artefactos de entrenamiento
+models/
+*.pth
+*.pt
+*.ckpt
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Configuracion local
+.env
+.vscode/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
