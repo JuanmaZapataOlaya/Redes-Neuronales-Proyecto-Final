@@ -154,3 +154,20 @@ NUM_WORKERS = 0
 
 <img width="500"  alt="image" src="https://github.com/user-attachments/assets/a69fc5c6-f2ff-4a74-9403-ea4ecde3ce73" />
 
+## Arquitectura Propuesta
+
+```text
+SEED = 42
+DATA_DIR = Path("data")
+OUTPUT_DIR = Path("models")
+IMAGE_SIZE = 224
+BATCH_SIZE = 32
+EPOCHS = 15
+LEARNING_RATE = 1e-4
+NUM_WORKERS = 0
+```
+
+<img width="500"  alt="image" src="https://github.com/user-attachments/assets/bad2e4e7-78a5-4324-8112-0250a5d99317" />
+
+<img width="500"  alt="image" src="https://github.com/user-attachments/assets/d21c6042-fe63-4a14-9231-794674c7a5ce" />
+
