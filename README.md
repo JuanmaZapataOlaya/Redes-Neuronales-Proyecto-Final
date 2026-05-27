@@ -1,193 +1,194 @@
-# Diagnostico de Neumonia con Redes Neuronales
+# Detección de Neumonía en Radiografías de Tórax
 
-Proyecto academico en Python y PyTorch para clasificar radiografias de torax como `NORMAL` o `PNEUMONIA`. La estructura se mantiene simple: un README y notebooks autocontenidos para comparar tres arquitecturas.
+Clasificación binaria de imágenes de radiografías de tórax como **NORMAL** o **NEUMONÍA**, utilizando una Red Neuronal Convolucional diseñada a medida y entrenada desde cero en PyTorch.
 
-> Este proyecto es educativo. No debe utilizarse como herramienta clinica sin validacion medica, auditoria de sesgos y evaluacion regulatoria.
+> 🎓 Proyecto final para el curso de Deep Learning. Solo con fines educativos — **no reemplaza la evaluación médica ni la validación clínica.**
 
-## Estructura
+---
 
-```text
+## 📋 Tabla de Contenidos
+
+- [Descripción del proyecto](#descripción-del-proyecto)
+- [Dataset](#dataset)
+- [Estructura del repositorio](#estructura-del-repositorio)
+- [Instalación](#instalación)
+- [Cómo ejecutar](#cómo-ejecutar)
+- [Resultados](#resultados)
+- [Declaración de Uso de IA](#declaración-de-uso-de-ia)
+- [Referencias](#referencias)
+
+---
+
+## Descripción del proyecto
+
+Implementamos una CNN pequeña (~321K parámetros) llamada `OptimizedCNN`, diseñada para el dataset **Chest X-Ray (Pneumonia)** de Kaggle. Las decisiones clave fueron:
+
+- **Entrenamiento desde cero** (sin transfer learning), para demostrar que una regularización cuidadosa es suficiente para este dataset.
+- **Manejo del desbalance de clases en dos frentes**: pérdida ponderada por clase + `WeightedRandomSampler`.
+- **Selección de modelo con criterio clínico**: el mejor checkpoint se elige por el **recall en la clase NEUMONÍA**, no por accuracy — los falsos negativos son lo más costoso.
+- **Early stopping** + scheduler `ReduceLROnPlateau`.
+- **Aumentación de datos agresiva** (`RandomAffine`, `RandomErasing`) para prevenir el sobreajuste en un dataset relativamente pequeño.
+
+## Dataset
+
+- **Fuente**: [Chest X-Ray Images (Pneumonia)](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia) — Kaggle.
+- **Tamaño**: 5,856 radiografías frontales de tórax de pacientes pediátricos.
+- **Clases**: `NORMAL`, `PNEUMONIA`.
+- **Particiones** (tal como las provee la fuente):
+  - Entrenamiento: 5,216 imágenes
+  - Validación: 16 imágenes
+  - Prueba: 624 imágenes
+
+Estructura de carpetas esperada:
+
+```
+data/
+├── train/
+│   ├── NORMAL/
+│   └── PNEUMONIA/
+├── val/
+│   ├── NORMAL/
+│   └── PNEUMONIA/
+└── test/
+    ├── NORMAL/
+    └── PNEUMONIA/
+```
+
+> Si se ejecuta en Kaggle, el notebook detecta automáticamente `/kaggle/input` (ver Celda 3).
+
+## Estructura del repositorio
+
+```
 .
-|-- README.md
-|-- arquitectura_base_neumonia.ipynb
-|-- arquitectura_cnn_avanzada_neumonia.ipynb
-|-- arquitectura_transfer_learning_neumonia.ipynb
-`-- .gitignore
+├── arquitectura_optimizada_neumonia.ipynb   # Notebook principal (pipeline completo)
+├── Project_Report.pdf                       # Informe final de 2 páginas
+├── README.md                                # Este archivo
+├── requirements.txt                         # Dependencias de Python
+├── AI_USAGE.md                              # Declaración de uso de IA
+└── models/                                  # Generado en tiempo de ejecución
+    ├── best_optimized_cnn.pth               # Mejor checkpoint
+    ├── training_curves.png
+    ├── confusion_matrix.png
+    ├── class_distribution.png
+    ├── sample_images.png
+    └── error_examples.png
 ```
 
-Cada notebook contiene todo el flujo:
+## Instalación
 
-- Configuracion reproducible.
-- Carga del dataset desde carpetas.
-- Transformaciones de entrenamiento y validacion.
-- Arquitectura del modelo correspondiente.
-- Ciclo de entrenamiento y evaluacion.
-- Guardado del mejor modelo.
-- Graficas de perdida y exactitud.
-- Reporte final sobre `test` cuando ese split existe.
-
-## Dataset esperado
-
-Coloca las imagenes en una carpeta `data/` con esta organizacion:
-
-```text
-data/
-  train/
-    NORMAL/
-    PNEUMONIA/
-  val/
-    NORMAL/
-    PNEUMONIA/
-  test/
-    NORMAL/
-    PNEUMONIA/
-```
-
-El split `test` es opcional. `train` y `val` son requeridos para entrenar.
-
-## Dependencias
-
-Instala las librerias necesarias en tu entorno:
+Requiere **Python 3.10+**. Se recomienda usar un entorno virtual.
 
 ```bash
-pip install torch torchvision matplotlib scikit-learn pillow notebook
+# 1. Clonar el repositorio
+git clone <url-del-repositorio>
+cd <nombre-del-repositorio>
+
+# 2. Crear y activar un entorno virtual
+python -m venv venv
+source venv/bin/activate          # Linux/Mac
+# venv\Scripts\activate            # Windows
+
+# 3. Instalar dependencias
+pip install -r requirements.txt
+
+# 4. (Opcional) Instalar PyTorch con soporte CUDA
+# Ver https://pytorch.org/get-started/locally/ para tu versión específica de CUDA.
 ```
 
-Si tienes GPU NVIDIA, instala la version de PyTorch compatible con tu CUDA desde la guia oficial de PyTorch. Los notebooks detectan CUDA automaticamente cuando esta disponible.
+## Cómo ejecutar
 
-## Uso
+### Opción A — Localmente
 
-Descarga el dataset en Kaggle:
+1. Descargar el dataset de Kaggle y colocarlo en `./data/` siguiendo la estructura indicada anteriormente.
+2. Abrir el notebook:
 
-https://www.kaggle.com/datasets/assemelqirsh/chest-x-ray-dataset?resource=download
+   ```bash
+   jupyter notebook arquitectura_optimizada_neumonia.ipynb
+   ```
 
-Para este caso solo vamos a usar `chest_xray`, respetando la estructura con la que ya viene:
+3. Ejecutar las celdas de arriba hacia abajo. **Omitir la Celda 3** (detección automática exclusiva de Kaggle).
 
-```text
-data/
-  train/
-    NORMAL/
-    PNEUMONIA/
-  val/
-    NORMAL/
-    PNEUMONIA/
-  test/
-    NORMAL/
-    PNEUMONIA/
-```
+### Opción B — En Kaggle
 
-Cambia el nombre de la carpeta a `data`; si no, fallara la celda de carga de datos.
+1. Crear un nuevo notebook y subir `arquitectura_optimizada_neumonia.ipynb`.
+2. Agregar el dataset **Chest X-Ray Images (Pneumonia)** como entrada.
+3. Habilitar el acelerador GPU en *Opciones del notebook*.
+4. Ejecutar todas las celdas (la Celda 3 resuelve automáticamente la ruta del dataset).
 
-Abre el notebook que quieras entrenar:
+### Hiperparámetros
 
-```bash
-jupyter notebook arquitectura_base_neumonia.ipynb
-jupyter notebook arquitectura_cnn_avanzada_neumonia.ipynb
-jupyter notebook arquitectura_transfer_learning_neumonia.ipynb
-```
+Los parámetros más relevantes se encuentran en la Celda 2:
 
-Ejecuta las celdas de arriba hacia abajo. Antes de entrenar puedes ajustar estos parametros en la celda de configuracion:
+| Parámetro | Valor por defecto | Notas |
+|---|---|---|
+| `IMAGE_SIZE` | 224 | Resolución de entrada |
+| `BATCH_SIZE` | 32 | Reducir si hay errores de memoria |
+| `EPOCHS` | 20 | Límite superior; el early stopping determina el fin real |
+| `LEARNING_RATE` | 1e-4 | Adam |
+| `WEIGHT_DECAY` | 1e-4 | Regularización L2 |
+| `DROPOUT_RATE` | 0.4 | Aplicado en la cabeza clasificadora |
+| `PATIENCE` | 5 | Paciencia del early stopping |
+| `MONITOR_METRIC` | `"recall_pneumonia"` | o `"val_acc"` |
+| `USE_WEIGHTED_SAMPLER` | `True` | Balancea los batches |
 
-- `DATA_DIR`: ruta del dataset.
-- `OUTPUT_DIR`: carpeta para pesos y graficas.
-- `IMAGE_SIZE`: resolucion de entrada.
-- `BATCH_SIZE`: tamano del lote.
-- `EPOCHS`: numero de epocas.
-- `LEARNING_RATE`: tasa de aprendizaje.
+## Resultados
 
-Si ejecutas en Kaggle, corre la celda opcional marcada como `CELDA OPCIONAL PARA KAGGLE` despues de imports/configuracion. Esa celda busca el dataset dentro de `/kaggle/input` y ajusta `DATA_DIR` automaticamente.
+Rendimiento aproximado en el conjunto de prueba (varía según la semilla aleatoria):
 
-## Arquitectura base
+| Métrica | Valor |
+|---|---|
+| Accuracy | ~0.89 |
+| Recall NEUMONÍA | ~0.96 |
+| AUC-ROC | ≥0.93 |
 
-`BaseCNN` usa tres bloques convolucionales:
+Ver el desglose completo, la matriz de confusión y el análisis de errores en `Project_Report.pdf` y en las secciones §8–§10 del notebook.
 
-```text
-Conv2d -> ReLU -> MaxPool2d
-Conv2d -> ReLU -> MaxPool2d
-Conv2d -> ReLU -> MaxPool2d
-AdaptiveAvgPool2d -> Linear -> ReLU -> Linear
-```
+---
 
-## CNN avanzada
+## Declaración de Uso de IA
 
-`AdvancedCNN` usa bloques con dos convoluciones, `BatchNorm2d`, `ReLU`, `MaxPool2d` y `Dropout`. Es una segunda prueba mas robusta para reducir sobreajuste y comparar contra la arquitectura base.
+Este proyecto fue desarrollado con la asistencia de herramientas de inteligencia artificial. En cumplimiento con los requisitos de transparencia académica, declaramos lo siguiente:
 
-## Transfer learning
+### Herramientas de IA Utilizadas
 
-El notebook de transferencia usa `ResNet-50` de `torchvision`, reemplaza la capa final por una salida de dos clases y permite congelar el backbone con `FREEZE_BACKBONE = True`.
+- **Claude (Anthropic)** — Asistente de modelo de lenguaje grande.
 
-## Salidas
+### Propósito de Uso
 
-Durante el entrenamiento se crea la carpeta `models/` con:
+La asistencia de IA se utilizó en un **rol de apoyo** a lo largo de las distintas etapas del proyecto. El equipo conservó la plena propiedad intelectual sobre las decisiones de diseño, los criterios de selección de modelos y la interpretación de resultados. Cada línea de código fue revisada y validada por el equipo antes de ser incluida en la entrega final.
 
-```text
-models/
-  best_base_cnn.pth
-  best_advanced_cnn.pth
-  best_resnet50_transfer.pth
-  training_curves.png
-  training_curves_advanced_cnn.png
-  training_curves_resnet50_transfer.png
-```
+### Áreas del Proyecto Apoyadas por IA
 
-Cada checkpoint guarda los pesos del mejor modelo segun exactitud de validacion, el tamano de imagen y el mapeo de clases.
+| Área | Cómo se utilizó la IA |
+|---|---|
+| **Programación** | Sugerencia de expresiones idiomáticas de PyTorch, refactorización de código repetitivo, y apoyo en la estructuración del `Dataset`, `DataLoader`, el ciclo de entrenamiento y las utilidades de evaluación. |
+| **Depuración** | Diagnóstico de discrepancias en las dimensiones de tensores, problemas de configuración del dataloader y errores relacionados con la reproducibilidad. |
+| **Documentación** | Redacción de docstrings, contenido del README y el informe del proyecto. La redacción final y la precisión técnica fueron revisadas por el equipo. |
+| **Exploración de arquitecturas** | Discusión de las ventajas y desventajas entre transfer learning y entrenamiento desde cero, técnicas de regularización (BatchNorm, Dropout, weight decay) y estrategias para el manejo del desbalance de clases. |
+| **Análisis e informes** | Estructuración del EDA, el análisis de errores y el informe final. La interpretación de las métricas y las conclusiones son propias del equipo. |
 
-## Siguiente paso sugerido
+### Lo que NO Se Delegó a la IA
 
-Entrena los tres notebooks con los mismos splits y compara exactitud, precision, recall y F1-score sobre `test`.
+- **Decisiones conceptuales**: la elección del dataset, el planteamiento del problema, la decisión de optimizar el recall para NEUMONÍA y la estrategia de selección del modelo fueron tomadas por el equipo.
+- **Validación de resultados**: cada bloque de código, métrica y afirmación del informe fue verificada de forma independiente por el equipo antes de ser entregada.
+- **Análisis crítico**: el análisis de errores y las lecciones aprendidas fueron redactados por el equipo a partir de los resultados reales del modelo.
 
-# Resultados Obtenidos
+### Declaración de Responsabilidad
 
-## Arquitectura Base
+El equipo asume la **plena responsabilidad** del trabajo entregado. Comprendemos todo el pipeline, podemos explicar cada decisión de diseño y somos capaces de reproducir todos los resultados reportados. Las herramientas de IA se utilizaron como una ayuda para la productividad — comparable a consultar documentación, libros de texto o un compañero de estudio — pero nunca como sustituto de la comprensión propia.
 
-```text
-SEED = 42
-DATA_DIR = Path("data")
-OUTPUT_DIR = Path("models")
-IMAGE_SIZE = 224
-BATCH_SIZE = 32
-EPOCHS = 10
-LEARNING_RATE = 1e-4
-NUM_WORKERS = 0
-```
-<img width="500" alt="image" src="https://github.com/user-attachments/assets/3adfada4-566f-4a04-a626-dc520a144eaa" />
+*Esta declaración se incluye en cumplimiento con el requisito de Declaración de Uso de IA de los entregables del Proyecto de Deep Learning.*
 
-<img width="500"  alt="image" src="https://github.com/user-attachments/assets/a69fc5c6-f2ff-4a74-9403-ea4ecde3ce73" />
+---
 
-## Arquitectura Propuesta
+## Referencias
 
-```text
-SEED = 42
-DATA_DIR = Path("data")
-OUTPUT_DIR = Path("models")
-IMAGE_SIZE = 224
-BATCH_SIZE = 32
-EPOCHS = 15
-LEARNING_RATE = 1e-4
-NUM_WORKERS = 0
-```
+1. Kermany, D. S., et al. (2018). *Identifying medical diagnoses and treatable diseases by image-based deep learning.* **Cell**, 172(5), 1122–1131.
+2. Ioffe, S., & Szegedy, C. (2015). *Batch Normalization.* **ICML**.
+3. Srivastava, N., et al. (2014). *Dropout: A Simple Way to Prevent Neural Networks from Overfitting.* **JMLR**, 15(1).
+4. He, K., et al. (2015). *Delving Deep into Rectifiers.* **ICCV**.
+5. Documentación oficial de PyTorch — https://pytorch.org/docs/stable/
 
-<img width="500"  alt="image" src="https://github.com/user-attachments/assets/bad2e4e7-78a5-4324-8112-0250a5d99317" />
+---
 
-<img width="500"  alt="image" src="https://github.com/user-attachments/assets/d21c6042-fe63-4a14-9231-794674c7a5ce" />
-
-## Transfer Learning
-
-```text
-SEED = 42
-DATA_DIR = Path("data")
-OUTPUT_DIR = Path("models")
-IMAGE_SIZE = 224
-BATCH_SIZE = 16
-EPOCHS = 10
-LEARNING_RATE = 1e-4
-NUM_WORKERS = 0
-USE_PRETRAINED = True
-FREEZE_BACKBONE = True
-```
-
-<img width="500" alt="image" src="https://github.com/user-attachments/assets/966a1952-bafb-4c4a-9fb4-0a9e1c8e2eae" />
-
-<img width="500" alt="image" src="https://github.com/user-attachments/assets/bb0c790c-11bc-473e-8ca3-b5dbccf998d2" />
-
-
+**Nota:** Este proyecto es únicamente con fines educativos.
