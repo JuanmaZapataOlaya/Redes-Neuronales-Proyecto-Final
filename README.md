@@ -4,6 +4,10 @@ Clasificación binaria de imágenes de radiografías de tórax como **NORMAL** o
 
 > 🎓 Proyecto final para el curso de Deep Learning. Solo con fines educativos — **no reemplaza la evaluación médica ni la validación clínica.**
 
+# Video explicativo
+
+- https://youtu.be/ZOwFutawIJc
+
 ---
 
 ## 📋 Tabla de Contenidos
